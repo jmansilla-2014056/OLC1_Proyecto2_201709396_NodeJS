@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
 
 router.post('/',  (req, res)=> {
     console.log(req.body.llave);
-    res.json({ mensaje: 'Node js: Resivido' });
+    res.json({mensaje: 'Node js: Resivido' });
 });
 
 module.exports = router;
