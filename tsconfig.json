@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "watch": true,       //transpilara todos los archivos ts
-   // "outDir": "./src",   //Directorio donde almacenara los js generados
+    //"outDir": "./src",   //Directorio donde almacenara los js generados
     "rootDir": "./",     //Directorio donde estaran los archivos ts
     /* Basic Options */
     // "incremental": true,                   /* Enable incremental compilation */
