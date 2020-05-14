@@ -4,7 +4,7 @@ var parser = require('../grammar/grammar').parser;
 function enter(input) {
     return parser.parse(input);
 }
-
+    
 var router = express.Router();
 
 /* GET home page. */
@@ -21,7 +21,9 @@ router.post('/',  (req, res)=> {
     jsonG = jsonG.split('nombre1').join('text').split('listaIns').join('children');
     console.log(jsonG);
 
-    res.json({mensaje: 'Node js: Resivido' });
+    var result1 = JSON.parse(jsonG);
+
+    res.json({tree: result1});
 });
 
 module.exports = router;

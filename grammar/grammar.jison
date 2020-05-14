@@ -1,11 +1,12 @@
 /**
- * Ejemplo mi primer proyecto con Jison utilizando Nodejs en Ubuntu
+ * Ejemplo mi primer proyecto con Jison utilizando NodeAstjs en Ubuntu
  */
 
 
 %{
-    const {Node} = require('../treeAST/Node');
+    const {NodeAst} = require('../treeAST/NodeAst');
     var count = 0;
+    var prueba = "puto"
 %}
 
 
@@ -24,81 +25,81 @@
 
 [/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]    {};
 
-"int"                   return 'INT';
-"double"                return 'DOUBLE';
-"boolean"               return 'BOOLEAN';
-"char"                  return 'CHAR';
-"String"                return 'STRING';
+"int"                   return 'int';
+"double"                return 'double';
+"boolean"               return 'boolean';
+"char"                  return 'char';
+"String"                return 'string';
 
 
-"if"                    return 'IF';
-"else"                  return 'ELSE';
-"switch"                return 'SWITCH';
-"case"                  return 'CASE';
-"while"                 return 'WHILE';
-"do"                    return 'DO';
-"for"                   return 'FOR';
-"void"                  return 'VOID';
-"return"                return 'RETURN';
-"break"                 return 'BREAK';
-"main"                  return 'MAIN';
-"continue"              return'CONTINUE';
-"System.out.println"    return'SOUTLN';
-"System.out.print"      return'SOUT';
+"if"                    return 'if';
+"else"                  return 'else';
+"switch"                return 'switch';
+"case"                  return 'case';
+"while"                 return 'while';
+"do"                    return 'do';
+"for"                   return 'for';
+"void"                  return 'void';
+"return"                return 'return';
+"break"                 return 'break';
+"main"                  return 'main';
+"continue"              return'continue';
+"System.out.println"    return'soutln';
+"System.out.print"      return'sout';
 
 
-"import"                return'IMPORT';
-"class"                 return'CLASS';
-"true"                  return'TRUE';
-"false"                 return'FALSE';
-"default"               return'DEFAULT';
+"import"                return'import';
+"class"                 return'class';
+"true"                  return'true';
+"false"                 return'false';
+"default"               return'default';
 
-"{"                     return 'LLAVEIZQ';
-"}"                     return 'LLAVEDER';
-";"                     return 'PTCOMA';
-"("                     return 'PARIZQ';
-")"                     return 'PARDER';
-"["                     return 'CORIZQ';
-"]"                     return 'CORDER';
-","                     return 'COMA';
-":"                     return 'DOSPUNTOS';
+"{"                     return 'lizquierdo';
+"}"                     return 'lderecho';
+";"                     return 'puntocoma';
+"("                     return 'pizquierdo';
+")"                     return 'pderecho';
+"["                     return 'cizquierdo';
+"]"                     return 'cderecho';
+","                     return 'coma';
+":"                     return 'dospuntos';
 
-"&&"                    return 'AND';
-"||"                    return 'OR';
-"!="                    return 'DISTINTO';
-"=="                    return 'IGUALDAD';
-">="                    return 'MAYORIGUALQUE';
-"<="                    return 'MENORIGUALQUE';
-">"                     return 'MAYORQUE';
-"<"                     return 'MENORQUE';
-
-
-"="                     return 'IGUAL';
+"&&"                    return 'and';
+"||"                    return 'or';
+"!="                    return 'distinto';
+"=="                    return 'igualdad';
+">="                    return 'mayorigualque';
+"<="                    return 'menorigualque';
+">"                     return 'mayorque';
+"<"                     return 'menorque';
 
 
-"!"                     return 'NOT';
+"="                     return 'igual';
 
 
-"+"                     return 'MAS';
-"-"                     return 'MENOS';
-"*"                     return 'POR';
-"/"                     return 'DIVIDIDO';
-"%"                     return 'MODULO';
-"^"                     return 'POTENCIA';
-
-[0-9]+("."[0-9]+)       return 'DECIMAL';
-
-[0-9]+\b                return 'ENTERO';
+"!"                     return 'not';
 
 
+"+"                     return 'mas';
+"-"                     return 'menos';
+"*"                     return 'por';
+"/"                     return 'dividido';
+"%"                     return 'modulo';
+"^"                     return 'potencia';
 
+[0-9]+("."[0-9]+)       return 'decimal';
 
-(\"[^"]*\")             return 'CADENA';
-(\'[^']\')              return'CARACTER';
+[0-9]+\b                return 'entero';
 
 
 
-([a-zA-Z]|[_])[a-zA-Z0-9_]* return 'IDENTIFICADOR';
+
+(\"[^"]*\")             return 'cadena';
+(\'[^']\')              return'caracter';
+
+
+
+([a-zA-Z]|[_])[a-zA-Z0-9_]* return 'identificador';
 
 
 
@@ -110,14 +111,14 @@
 /* Asociación de operadores y precedencia */
 
 
-%left OR
-%left AND
-%left IGUALDAD, DISTINTO
-%left MAYORIGUALQUE, MENORIGUALQUE, MENORQUE, MAYORQUE
-%left MAS, MENOS
-%left POR, DIVIDIDO, MODULO
-%left POTENCIA
-%right NOT
+%left or
+%left and
+%left igualdad, distinto
+%left mayorigualque, menorigualque, menorque, mayorque
+%left mas, menos
+%left por, dividido, modulo
+%left potencia
+%right not
 %left UMENOS
 
 %start INICIO
@@ -127,6 +128,17 @@
 INICIO : IMPORTSYCLASES EOF {$$=$1; return $$;}
         |error { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
 ;
+
+IMPORTSYCLASES: IMPORT2 CLASE2 {$$=new NodeAst("Raiz","Raiz",count++); $$.encontrarNodeAst($1);$$.listaIns.push($2);
+            |CLASE2 {$$ = new NodeAst("Raiz","Raiz",count++); $$.encontrarNodeAst($1); }
+            ;
+
+IMPORT2: IMPORT2 import identificador puntocoma {$$=$1;$$.push(new NodeAst("Import",$2+" "+$3,count++))}
+        |import identificador puntocoma {$$=[];$$.push(new NodeAst("Import",$1+" "+$2,count++))}
+        ;
+
+CLASE2 : class identificador BLOQUE_INSTRUCCIONESCLASE { $$ = new NodeAst("Clase", $1+" "+$2, count++);if($3!=null){$$.encontrarNodeAst($3)};}
+       ;
 
 INSTRUCCIONES : INSTRUCCIONES INSTRUCCION
               | INSTRUCCION
@@ -138,6 +150,7 @@ INSTRUCCION : PRINT
             | FOR2
             | DO2
             | SWITCH2
+            | CLASE2
 ;
 
 
@@ -148,18 +161,9 @@ INSTRUCCIONESCLASE : INSTRUCCIONESCLASE INSTRUCCIONCLASE
 INSTRUCCIONCLASE : CLASE2
 ;
 
-INICIO2: IMPORTSYCLASES {$$= new Node("Raiz","Raiz",count++);$$.listaIns.push($1)}
+INICIO2: IMPORTSYCLASES {$$= new NodeAst("Raiz","Raiz",count++);$$.listaIns.push($1)}
     ;
 
-
-
-IMPORTSYCLASES: IMPORT2 CLASE2 {$$=new Node("Raiz","Raiz",count++); $$.encontrarNode($1);$$.listaIns.push($2);}
-            |CLASE2 {$$ = new Node("Raiz","Raiz",count++); $$.listaIns.push($1);}
-            ;
-
-IMPORT2: IMPORT2 IMPORT IDENTIFICADOR PTCOMA {$$=$1;$$.push(new Node("Import",$2+" "+$3,count++))}
-        |IMPORT IDENTIFICADOR PTCOMA {$$=[];$$.push(new Node("Import",$1+" "+$2,count++))}
-        ;
 
 INSTRUCCIONESDENTROCLASE : INSTRUCCIONESDENTROCLASE INSTRUCCIONDENTROCLASE {$$=$1;$$.push($2)}
               | INSTRUCCIONDENTROCLASE   {$$=[];$$.push($1)}
@@ -183,8 +187,8 @@ INSTRUCCIONMETODO : PRINT {$$ = $1}
             | SWITCHM {$$ = $1}
             | DECLARACION {$$ = $1}
             | ASIGNACION {$$ = $1}
-            | IDENTIFICADOR PARIZQ LISTAEXPRESION PARDER PTCOMA {$$ = new Node("Sentencia", $1,count++); $$.encontrarNode($3)}
-            | RETURN PTCOMA {$$ = new Node("Sentencia",$1,count++);}
+            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
+            | return puntocoma {$$ = new NodeAst("Sentencia",$1,count++);}
 
 ;
 
@@ -200,7 +204,7 @@ INSTRUCCIONFUNCION : PRINT {$$ = $1}
             | SWITCH2 {$$ = $1}
             | DECLARACION {$$ = $1}
             | ASIGNACION {$$ = $1}
-            | IDENTIFICADOR PARIZQ LISTAEXPRESION PARDER PTCOMA {$$ = new Node("Sentencia", $1,count++); $$.encontrarNode($3)}
+            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
 
 
 
@@ -216,10 +220,10 @@ INSTRUCCIONIF: PRINT {$$ = $1}
             | FOR2 {$$ = $1}
             | DO2 {$$ = $1}
             | SWITCH2 {$$ = $1}
-            |IDENTIFICADOR PARIZQ LISTAEXPRESION PARDER PTCOMA  {$$ = new Node("Sentencia", $1,count++); $$.encontrarNode($3)}
-            |DECLARACION {$$ = $1}
-            |ASIGNACION {$$ = $1}
-            | RETURN EXPRESION PTCOMA { $$ = new Node("Sentencia", $1,count++);$$.listaIns.push($2);}
+            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma  {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
+            | DECLARACION {$$ = $1}
+            | ASIGNACION {$$ = $1}
+            | return EXPRESION puntocoma { $$ = new NodeAst("Sentencia", $1,count++);$$.listaIns.push($2);}
             ;
 
 INSTRUCCIONESFOR: INSTRUCCIONESFOR INSTRUCCIONFOR {$$=$1;$$.push($2)}
@@ -232,12 +236,12 @@ INSTRUCCIONFOR: PRINT {$$ = $1}
             | FOR2 {$$ = $1}
             | DO2 {$$ = $1}
             | SWITCH2 {$$ = $1}
-            | BREAK PTCOMA { $$ = new Node("Sentencia", $1,count++);}
-            | CONTINUE PTCOMA { $$ = new Node("Sentencia", $1,count++);}
-            | IDENTIFICADOR PARIZQ LISTAEXPRESION PARDER PTCOMA {$$ = new Node("Sentencia", $1,count++); $$.encontrarNode($3)}
+            | break puntocoma { $$ = new NodeAst("Sentencia", $1,count++);}
+            | continue puntocoma { $$ = new NodeAst("Sentencia", $1,count++);}
+            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
             | DECLARACION {$$ = $1}
             | ASIGNACION {$$ = $1}
-            | RETURN EXPRESION PTCOMA { $$ = new Node("Sentencia", $1,count++);$$.listaIns.push($2);}
+            | return EXPRESION puntocoma { $$ = new NodeAst("Sentencia", $1,count++);$$.listaIns.push($2);}
             ;
 
 
@@ -251,135 +255,132 @@ INSTRUCCIONSWITCH: PRINT {$$ = $1}
             | FOR2 {$$ = $1}
             | DO2 {$$ = $1}
             | SWITCH2 {$$ = $1}
-            | BREAK PTCOMA { $$ = new Node("Sentencia", $1,count++);}
-            |IDENTIFICADOR PARIZQ LISTAEXPRESION PARDER PTCOMA {$$ = new Node("Sentencia", $1,count++); $$.encontrarNode($3)}
+            | break puntocoma { $$ = new NodeAst("Sentencia", $1,count++);}
+            |identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
             |DECLARACION {$$ = $1}
             |ASIGNACION {$$ = $1}
-            |RETURN EXPRESION PTCOMA { $$ = new Node("Sentencia", $1,count++);$$.listaIns.push($2);}
+            |return EXPRESION puntocoma { $$ = new NodeAst("Sentencia", $1,count++);$$.listaIns.push($2);}
             ;
 
-LISTAEXPRESION: LISTAEXPRESION COMA EXPRESION  {$$=$1;$$.push($3)}
+LISTAEXPRESION: LISTAEXPRESION coma EXPRESION  {$$=$1;$$.push($3)}
                 |EXPRESION {$$=[];$$.push($1)}
                 ;
 
 
-FUNCION2: TIPO IDENTIFICADOR PARIZQ PARAMETROS PARDER BLOQUE_INSTRUCCIONESFUNCION {$$=new Node("Funcion",$1+" "+$2, count++);$$.encontrarNode($4);if($6!=null){$$.encontrarNode($6)};}
-        | TIPO IDENTIFICADOR PARIZQ  PARDER BLOQUE_INSTRUCCIONESFUNCION {$$=new Node("Funcion",$1+" "+$2, count++);if($5!=null){$$.encontrarNode($5)};}
+FUNCION2: TIPO identificador pizquierdo PARAMETROS pderecho BLOQUE_INSTRUCCIONESFUNCION {$$=new NodeAst("Funcion",$1+" "+$2, count++);$$.encontrarNodeAst($4);if($6!=null){$$.encontrarNodeAst($6)};}
+        | TIPO identificador pizquierdo  pderecho BLOQUE_INSTRUCCIONESFUNCION {$$=new NodeAst("Funcion",$1+" "+$2, count++);if($5!=null){$$.encontrarNodeAst($5)};}
 
     ;
 
-METODO2 : VOID IDENTIFICADOR PARIZQ PARAMETROS PARDER BLOQUE_INSTRUCCIONESMETODO {$$=new Node("Metodo",$1+" "+$2,count++);$$.encontrarNode($4);if($6!=null){$$.encontrarNode($6)};}
-        | VOID IDENTIFICADOR PARIZQ  PARDER BLOQUE_INSTRUCCIONESMETODO {$$=new Node("Metodo",$1+" "+$2,count++);if($5!=null){$$.encontrarNode($5)};}
-        |  VOID MAIN PARIZQ PARDER BLOQUE_INSTRUCCIONESMETODO {$$=new Node("Main",$1+" "+$2,count++);if($5!=null){$$.encontrarNode($5)};}
+METODO2 : void identificador pizquierdo PARAMETROS pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Metodo",$1+" "+$2,count++);$$.encontrarNodeAst($4);if($6!=null){$$.encontrarNodeAst($6)};}
+        | void identificador pizquierdo  pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Metodo",$1+" "+$2,count++);if($5!=null){$$.encontrarNodeAst($5)};}
+        |  void main pizquierdo pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Main",$1+" "+$2,count++);if($5!=null){$$.encontrarNodeAst($5)};}
 
     ;
 
-CLASE2 : CLASS IDENTIFICADOR BLOQUE_INSTRUCCIONESCLASE { $$ = new Node("Clase", $1+" "+$2, count++);if($3!=null){$$.encontrarNode($3)};}
-    ;
-
-SWITCH2 : SWITCH  CONDICION LLAVEIZQ CASE2 LLAVEDER {$$=new Node("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNode($4);}
-        | SWITCH CONDICION LLAVEIZQ CASE2 DEFAULT2 LLAVEDER {$$=new Node("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNode($4);$$.listaIns.push($5);}
+SWITCH2 : switch  CONDICION lizquierdo CASE2 lderecho {$$=new NodeAst("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNodeAst($4);}
+        | switch CONDICION lizquierdo CASE2 DEFAULT2 lderecho {$$=new NodeAst("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNodeAst($4);$$.listaIns.push($5);}
 
     ;
 
-CASE2: CASE2 CASE EXPRESION DOSPUNTOS INSTRUCCIONESSWITCH {$$=$1;$$.push(new Node("Sentencia",$2, count++));$$[$$.length-1].listaIns.push($3);if($5!=null){$$[$$.length-1].encontrarNode($5)};}
-    |CASE EXPRESION DOSPUNTOS INSTRUCCIONESSWITCH {$$=[];$$.push(new Node("Sentencia",$1, count++));$$[0].listaIns.push($2);if($4!=null){$$[0].encontrarNode($4)} ;}
+CASE2: CASE2 case EXPRESION dospuntos INSTRUCCIONESSWITCH {$$=$1;$$.push(new NodeAst("Sentencia",$2, count++));$$[$$.length-1].listaIns.push($3);if($5!=null){$$[$$.length-1].encontrarNodeAst($5)};}
+    |case EXPRESION dospuntos INSTRUCCIONESSWITCH {$$=[];$$.push(new NodeAst("Sentencia",$1, count++));$$[0].listaIns.push($2);if($4!=null){$$[0].encontrarNodeAst($4)} ;}
     ;
 
-DEFAULT2:  DEFAULT DOSPUNTOS  INSTRUCCIONESSWITCH {$$=new Node("Sentencia",$1, count++);if($3!=null){$$.encontrarNode($3)};}
+DEFAULT2:  default dospuntos  INSTRUCCIONESSWITCH {$$=new NodeAst("Sentencia",$1, count++);if($3!=null){$$.encontrarNodeAst($3)};}
 
     ;
 
-DO2 : DO BLOQUE_INSTRUCCIONESFOR WHILE CONDICION PTCOMA {$$=new Node("Sentencia",$1+$3, count++);if($2!=null){$$.encontrarNode($2)};$$.listaIns.push($4);}
+DO2 : do BLOQUE_INSTRUCCIONESFOR while CONDICION puntocoma {$$=new NodeAst("Sentencia",$1+$3, count++);if($2!=null){$$.encontrarNodeAst($2)};$$.listaIns.push($4);}
     ;
 
-FOR2 : FOR PARIZQ DECLARACION EXPRESION PTCOMA CONDICIONFOR PARDER BLOQUE_INSTRUCCIONESFOR {$$=new Node("Sentencia",$1, count++); $$.listaIns.push($3);$$.listaIns.push($4);$$.listaIns.push($6);if($8!=null){$$.encontrarNode($8)};}
-     | FOR PARIZQ ASIGNACION EXPRESION PTCOMA CONDICIONFOR PARDER BLOQUE_INSTRUCCIONESFOR  {$$=new Node("Sentencia",$1, count++); $$.listaIns.push($3);$$.listaIns.push($4);$$.listaIns.push($6);if($8!=null){$$.encontrarNode($8)};}
+FOR2 : for pizquierdo DECLARACION EXPRESION puntocoma CONDICIONFOR pderecho BLOQUE_INSTRUCCIONESFOR {$$=new NodeAst("Sentencia",$1, count++); $$.listaIns.push($3);$$.listaIns.push($4);$$.listaIns.push($6);if($8!=null){$$.encontrarNodeAst($8)};}
+     | for pizquierdo ASIGNACION EXPRESION puntocoma CONDICIONFOR pderecho BLOQUE_INSTRUCCIONESFOR  {$$=new NodeAst("Sentencia",$1, count++); $$.listaIns.push($3);$$.listaIns.push($4);$$.listaIns.push($6);if($8!=null){$$.encontrarNodeAst($8)};}
     ;
 
 
-CONDICIONFOR : IDENTIFICADOR MAS MAS {$$ = new Node("Asignacion",$1, count++); $$.listaIns.push(new Node("Incremento",$2+$3, count++));}
-     | IDENTIFICADOR MENOS MENOS {$$ = new Node("Asignacion",$1, count++); $$.listaIns.push(new Node("Decremento",$2+$3, count++));}
+CONDICIONFOR : identificador mas mas {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Incremento",$2+$3, count++));}
+     | identificador menos menos {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Decremento",$2+$3, count++));}
 ;
 
-TIPO : STRING {$$ = $1;}
-     | BOOLEAN {$$ = $1;}
-     | CHAR {$$ = $1;}
-     | DOUBLE {$$ = $1;}
-     | INT {$$ = $1;}
+TIPO : string {$$ = $1;}
+     | boolean {$$ = $1;}
+     | char {$$ = $1;}
+     | double {$$ = $1;}
+     | int {$$ = $1;}
+     ;
 
-DECLARACION : TIPO LISTAID IGUAL EXPRESION PTCOMA {$$=new Node("Declaracion",$1, count++); $$.encontrarNode($2);$$.listaIns.push($4);}
-            | TIPO LISTAID PTCOMA {$$=new Node("Declaracion",$1, count++); $$.encontrarNode($2);}
+DECLARACION : TIPO LISTAID igual EXPRESION puntocoma {$$=new NodeAst("Declaracion",$1, count++); $$.encontrarNodeAst($2);$$.listaIns.push($4);}
+            | TIPO LISTAID puntocoma {$$=new NodeAst("Declaracion",$1, count++); $$.encontrarNodeAst($2);}
             |
             ;
 
 
 
-LISTAID: LISTAID COMA IDENTIFICADOR {$$=$1;$$.push(new Node("Variable",$3, count++));}
-        |IDENTIFICADOR {$$=[];$$.push(new Node("Variable",$1, count++));}
+LISTAID: LISTAID coma identificador {$$=$1;$$.push(new NodeAst("Variable",$3, count++));}
+        |identificador {$$=[];$$.push(new NodeAst("Variable",$1, count++));}
         ;
 
 
-ASIGNACION : IDENTIFICADOR IGUAL EXPRESION PTCOMA {$$=new Node("Asignacion",$1, count++); $$.listaIns.push($3);}
-            | IDENTIFICADOR MAS MAS PTCOMA {$$ = new Node("Asignacion",$1, count++); $$.listaIns.push(new Node("Incremento",$2+$3, count++));}
-            | IDENTIFICADOR MENOS MENOS PTCOMA {$$ = new Node("Asignacion",$1, count++); $$.listaIns.push(new Node("Decremento",$2+$3, count++));}
+ASIGNACION : identificador igual EXPRESION puntocoma {$$=new NodeAst("Asignacion",$1, count++); $$.listaIns.push($3);}
+            | identificador mas mas puntocoma {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Incremento",$2+$3, count++));}
+            | identificador menos menos puntocoma {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Decremento",$2+$3, count++));}
     ;
 
-WHILE2 : WHILE CONDICION BLOQUE_INSTRUCCIONESFOR { $$ = new Node("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNode($3)};}
+WHILE2 : while CONDICION BLOQUE_INSTRUCCIONESFOR { $$ = new NodeAst("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNodeAst($3)};}
       ;
 
-IF2 : IF CONDICION BLOQUE_INSTRUCCIONESIF { $$ = new Node("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNode($3)};}
-   | IF CONDICION BLOQUE_INSTRUCCIONESIF ELSE2 { $$ = new Node("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNode($3)};$$.listaIns.push($4);}
+IF2 : if CONDICION BLOQUE_INSTRUCCIONESIF { $$ = new NodeAst("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNodeAst($3)};}
+   | if CONDICION BLOQUE_INSTRUCCIONESIF ELSE2 { $$ = new NodeAst("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNodeAst($3)};$$.listaIns.push($4);}
    ;
 
-ELSE2: ELSE BLOQUE_INSTRUCCIONESIF { $$ = new Node("Sentencia", $1, count++); if($2!=null){$$.encontrarNode($2)};}
-     |ELSE IF2 { $$ = $2;}
+ELSE2: else BLOQUE_INSTRUCCIONESIF { $$ = new NodeAst("Sentencia", $1, count++); if($2!=null){$$.encontrarNodeAst($2)};}
+     |else IF2 { $$ = $2;}
     ;
 
-CONDICION : PARIZQ EXPRESION PARDER { $$ = $2;}
+CONDICION : pizquierdo EXPRESION pderecho { $$ = $2;}
           ;
 
 
-BLOQUE_INSTRUCCIONES : LLAVEIZQ INSTRUCCIONES LLAVEDER
-                     | LLAVEIZQ LLAVEDER
+BLOQUE_INSTRUCCIONES : lizquierdo INSTRUCCIONES lderecho
+                     | lizquierdo lderecho
                      ;
 
-BLOQUE_INSTRUCCIONESIF : LLAVEIZQ INSTRUCCIONESIF LLAVEDER {$$=$2}
-                     | LLAVEIZQ LLAVEDER {$$=null;}
+BLOQUE_INSTRUCCIONESIF : lizquierdo INSTRUCCIONESIF lderecho {$$=$2}
+                     | lizquierdo lderecho {$$=null;}
                      ;
 
-BLOQUE_INSTRUCCIONESFOR : LLAVEIZQ INSTRUCCIONESFOR LLAVEDER  {$$=$2}
-                     | LLAVEIZQ LLAVEDER {$$=null;}
+BLOQUE_INSTRUCCIONESFOR : lizquierdo INSTRUCCIONESFOR lderecho  {$$=$2}
+                     | lizquierdo lderecho {$$=null;}
                      ;
 
-
-BLOQUE_INSTRUCCIONESCLASE : LLAVEIZQ INSTRUCCIONESDENTROCLASE LLAVEDER {$$=$2}
-                     | LLAVEIZQ LLAVEDER {$$=null;}
+BLOQUE_INSTRUCCIONESCLASE : lizquierdo INSTRUCCIONESDENTROCLASE FIN {$$=$2}
+                     | lizquierdo lderecho {$$=null;}
                      ;
 
-BLOQUE_INSTRUCCIONESMETODO : LLAVEIZQ INSTRUCCIONESMETODO LLAVEDER {$$=$2}
-                     | LLAVEIZQ LLAVEDER {$$=null;}
+BLOQUE_INSTRUCCIONESMETODO : lizquierdo INSTRUCCIONESMETODO lderecho {$$=$2}
+                     | lizquierdo lderecho {$$=null;}
                      ;
 
-BLOQUE_INSTRUCCIONESFUNCION : LLAVEIZQ INSTRUCCIONESFUNCION RETURN EXPRESION PTCOMA LLAVEDER {$$=$2;$$.push(new Node("Sentencia",$3,count++));$$[$$.length-1].listaIns.push($4);}
-                     | LLAVEIZQ RETURN EXPRESION PTCOMA LLAVEDER {$$=[]; $$.push(new Node("Sentencia",$2, count++));$$[0].listaIns.push($3);}
+BLOQUE_INSTRUCCIONESFUNCION : lizquierdo INSTRUCCIONESFUNCION return EXPRESION puntocoma lderecho {$$=$2;$$.push(new NodeAst("Sentencia",$3,count++));$$[$$.length-1].listaIns.push($4);}
+                     | lizquierdo return EXPRESION puntocoma lderecho {$$=[]; $$.push(new NodeAst("Sentencia",$2, count++));$$[0].listaIns.push($3);}
                      ;
 
-PRINT : SOUT PARIZQ EXPRESION PARDER PTCOMA { $$ = new Node("Imprimir", $1, count++);$$.listaIns.push($3);}
-    | SOUTLN PARIZQ EXPRESION PARDER PTCOMA { $$ = new Node("Imprimir", $1, count++);$$.listaIns.push($3);}
+PRINT : sout pizquierdo EXPRESION pderecho puntocoma { $$ = new NodeAst("Imprimir", $1, count++);$$.listaIns.push($3);}
+    | soutln pizquierdo EXPRESION pderecho puntocoma { $$ = new NodeAst("Imprimir", $1, count++);$$.listaIns.push($3);}
       ;
 
-PARAMETROS : PARAMETROS COMA TIPO IDENTIFICADOR {$$=$1;$$.push(new Node("Parametros",$3+" "+$4, count++));}
-        | TIPO IDENTIFICADOR {$$=[];$$.push(new Node("Parametros",$1+" "+$2, count++));}
+PARAMETROS : PARAMETROS coma TIPO identificador {$$=$1;$$.push(new NodeAst("Parametros",$3+" "+$4, count++));}
+        | TIPO identificador {$$=[];$$.push(new NodeAst("Parametros",$1+" "+$2, count++));}
         ;
 
-IFM:IF CONDICION BLOQUE_INSTRUCCIONESIFM { $$ = new Node("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNode($3)};}
-   | IF CONDICION BLOQUE_INSTRUCCIONESIFM ELSEM { $$ = new Node("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNode($3)};$$.listaIns.push($4);}
+IFM:if CONDICION BLOQUE_INSTRUCCIONESIFM { $$ = new NodeAst("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNodeAst($3)};}
+   | if CONDICION BLOQUE_INSTRUCCIONESIFM ELSEM { $$ = new NodeAst("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNodeAst($3)};$$.listaIns.push($4);}
    ;
 
 
-ELSEM: ELSE BLOQUE_INSTRUCCIONESIFM { $$ = new Node("Sentencia", $1, count++); if($2!=null){$$.encontrarNode($2)};}
-    |ELSE IFM { $$ = $2;}
+ELSEM: else BLOQUE_INSTRUCCIONESIFM { $$ = new NodeAst("Sentencia", $1, count++); if($2!=null){$$.encontrarNodeAst($2)};}
+    |else IFM { $$ = $2;}
 ;
 
 INSTRUCCIONESIFM: INSTRUCCIONESIFM INSTRUCCIONIFM {$$=$1;$$.push($2)}
@@ -392,23 +393,23 @@ INSTRUCCIONIFM: PRINT {$$ = $1}
             | FORM  {$$=$1}
             | DOM   {$$=$1}
             | SWITCHM  {$$=$1}
-            | IDENTIFICADOR PARIZQ LISTAEXPRESION PARDER PTCOMA {$$ = new Node("Sentencia", $1, count++); $$.encontrarNode($3)}
+            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1, count++); $$.encontrarNodeAst($3)}
             | DECLARACION {$$=$1}
             | ASIGNACION {$$=$1}
-            | RETURN PTCOMA { $$ = new Node("Sentencia", $1, count++);}
+            | return puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
             ;
 
-BLOQUE_INSTRUCCIONESIFM : LLAVEIZQ INSTRUCCIONESIFM LLAVEDER {$$=$2}
-                     | LLAVEIZQ LLAVEDER {$$=null;}
+BLOQUE_INSTRUCCIONESIFM : lizquierdo INSTRUCCIONESIFM lderecho {$$=$2}
+                     | lizquierdo lderecho {$$=null;}
                      ;
 
 
-WHILEM : WHILE CONDICION BLOQUE_INSTRUCCIONESFORM { $$ = new Node("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNode($3)};}
+WHILEM : while CONDICION BLOQUE_INSTRUCCIONESFORM { $$ = new NodeAst("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNodeAst($3)};}
       ;
 
 
-BLOQUE_INSTRUCCIONESFORM : LLAVEIZQ INSTRUCCIONESFORM LLAVEDER {$$=$2}
-                     | LLAVEIZQ LLAVEDER {$$=null;}
+BLOQUE_INSTRUCCIONESFORM : lizquierdo INSTRUCCIONESFORM lderecho {$$=$2}
+                     | lizquierdo lderecho {$$=null;}
                      ;
 
 INSTRUCCIONESFORM: INSTRUCCIONESFORM INSTRUCCIONFORM {$$=$1;$$.push($2)}
@@ -421,33 +422,33 @@ INSTRUCCIONFORM: PRINT {$$ = $1}
             | FORM {$$ = $1}
             | DOM {$$ = $1}
             | SWITCHM {$$ = $1}
-            | BREAK PTCOMA { $$ = new Node("Sentencia", $1, count++);}
-            | CONTINUE PTCOMA { $$ = new Node("Sentencia", $1, count++);}
-            | IDENTIFICADOR PARIZQ LISTAEXPRESION PARDER PTCOMA {$$ = new Node("Sentencia", $1, count++); $$.encontrarNode($3)}
+            | break puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
+            | continue puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
+            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1, count++); $$.encontrarNodeAst($3)}
             | DECLARACION {$$ = $1}
             | ASIGNACION {$$ = $1}
-            | RETURN PTCOMA { $$ = new Node("Sentencia", $1, count++);}
+            | return puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
             ;
 
-FORM : FOR PARIZQ DECLARACION EXPRESION PTCOMA CONDICIONFOR PARDER BLOQUE_INSTRUCCIONESFORM {$$=new Node("Sentencia",$1, count++); $$.listaIns.push($3);$$.listaIns.push($4);$$.listaIns.push($6);if($8!=null){$$.encontrarNode($8)};}
-     | FOR PARIZQ ASIGNACION EXPRESION PTCOMA CONDICIONFOR PARDER BLOQUE_INSTRUCCIONESFORM {$$=new Node("Sentencia",$1, count++); $$.listaIns.push($3);$$.listaIns.push($4);$$.listaIns.push($6);if($8!=null){$$.encontrarNode($8)};}
+FORM : for pizquierdo DECLARACION EXPRESION puntocoma CONDICIONFOR pderecho BLOQUE_INSTRUCCIONESFORM {$$=new NodeAst("Sentencia",$1, count++); $$.listaIns.push($3);$$.listaIns.push($4);$$.listaIns.push($6);if($8!=null){$$.encontrarNodeAst($8)};}
+     | for pizquierdo ASIGNACION EXPRESION puntocoma CONDICIONFOR pderecho BLOQUE_INSTRUCCIONESFORM {$$=new NodeAst("Sentencia",$1, count++); $$.listaIns.push($3);$$.listaIns.push($4);$$.listaIns.push($6);if($8!=null){$$.encontrarNodeAst($8)};}
     ;
 
-DOM : DO BLOQUE_INSTRUCCIONESFORM WHILE CONDICION PTCOMA {$$=new Node("Sentencia",$1+$3, count++);if($2!=null){$$.encontrarNode($2)};$$.listaIns.push($4);}
-    ;
-
-
-SWITCHM : SWITCH  CONDICION LLAVEIZQ CASEM LLAVEDER {$$=new Node("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNode($4);}
-        | SWITCH CONDICION LLAVEIZQ CASEM DEFAULTM LLAVEDER {$$=new Node("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNode($4);$$.listaIns.push($5);}
-
-    ;
-
-CASEM: CASEM CASE EXPRESION DOSPUNTOS INSTRUCCIONESSWITCHM {$$=$1;$$.push(new Node("Sentencia",$2, count++));$$[$$.length-1].listaIns.push($3);if($5!=null){$$[$$.length-1].encontrarNode($5)};}
-    |CASE EXPRESION DOSPUNTOS INSTRUCCIONESSWITCHM {$$=[];$$.push(new Node("Sentencia",$1, count++));$$[0].listaIns.push($2);if($4!=null){$$[0].encontrarNode($4)} ;}
+DOM : do BLOQUE_INSTRUCCIONESFORM while CONDICION puntocoma {$$=new NodeAst("Sentencia",$1+$3, count++);if($2!=null){$$.encontrarNodeAst($2)};$$.listaIns.push($4);}
     ;
 
 
-DEFAULTM:  DEFAULT DOSPUNTOS  INSTRUCCIONESSWITCHM {$$=new Node("Sentencia",$1, count++);if($3!=null){$$.encontrarNode($3)};}
+SWITCHM : switch  CONDICION lizquierdo CASEM lderecho {$$=new NodeAst("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNodeAst($4);}
+        | switch CONDICION lizquierdo CASEM DEFAULTM lderecho {$$=new NodeAst("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNodeAst($4);$$.listaIns.push($5);}
+
+    ;
+
+CASEM: CASEM case EXPRESION dospuntos INSTRUCCIONESSWITCHM {$$=$1;$$.push(new NodeAst("Sentencia",$2, count++));$$[$$.length-1].listaIns.push($3);if($5!=null){$$[$$.length-1].encontrarNodeAst($5)};}
+    |case EXPRESION dospuntos INSTRUCCIONESSWITCHM {$$=[];$$.push(new NodeAst("Sentencia",$1, count++));$$[0].listaIns.push($2);if($4!=null){$$[0].encontrarNodeAst($4)} ;}
+    ;
+
+
+DEFAULTM:  default dospuntos  INSTRUCCIONESSWITCHM {$$=new NodeAst("Sentencia",$1, count++);if($3!=null){$$.encontrarNodeAst($3)};}
 
     ;
 
@@ -461,38 +462,38 @@ INSTRUCCIONSWITCHM: PRINT {$$ = $1}
             | FORM {$$ = $1}
             | DOM {$$ = $1}
             | SWITCHM {$$ = $1}
-            | BREAK PTCOMA { $$ = new Node("Sentencia", $1, count++);}
-            |IDENTIFICADOR PARIZQ LISTAEXPRESION PARDER PTCOMA {$$ = new Node("Sentencia", $1, count++); $$.encontrarNode($3)}
+            | break puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
+            |identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1, count++); $$.encontrarNodeAst($3)}
             |DECLARACION {$$ = $1}
             |ASIGNACION {$$ = $1}
-            |RETURN PTCOMA { $$ = new Node("Sentencia", $1, count++);}
+            |return puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
             ;
 
 
-EXPRESION : MENOS EXPRESION %prec UMENOS
-          | NOT EXPRESION	          { $$ = new Node("Relacional", $1, count++);$$.listaIns.push($2);}
-          | EXPRESION MAS EXPRESION	     {$$= new Node("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION MENOS EXPRESION     {$$= new Node("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION POR EXPRESION		    {$$= new Node("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION DIVIDIDO EXPRESION	 {$$= new Node("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION MENORQUE EXPRESION	 {$$= new Node("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION MAYORQUE EXPRESION	{$$= new Node("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION MAYORIGUALQUE EXPRESION	 {$$= new Node("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION MENORIGUALQUE EXPRESION	  {$$= new Node("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION IGUALDAD EXPRESION	{$$= new Node("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION DISTINTO EXPRESION	{$$= new Node("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION OR EXPRESION	    {$$= new Node("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION AND EXPRESION	   {$$= new Node("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION POTENCIA EXPRESION	{$$= new Node("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | EXPRESION MODULO EXPRESION	  {$$= new Node("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
-          | DECIMAL   { $$ = new Node("Primitivo", $1, count++);}
-          | ENTERO	  { $$ = new Node("Primitivo", $1, count++);}
-          | TRUE	  { $$ = new Node("Primitivo", $1, count++);}
-          | FALSE	  { $$ = new Node("Primitivo", $1,  count++);}
-          | CADENA    { $$ = new Node("Primitivo", $1,  count++);}
-          | CARACTER  { $$ = new Node("Primitivo", $1,  count++);}
-          | IDENTIFICADOR PARIZQ LISTAEXPRESION PARDER 	{$$ = new Node("Variable", $1, count++); $$.encontrarNode($3)}
-          | IDENTIFICADOR PARIZQ PARDER 		    { $$ = new Node("Variable", $1, count++);}
-          | IDENTIFICADOR	{ $$ = new Node("Variable", $1,  count++);}
+EXPRESION : menos EXPRESION %prec UMENOS
+          | not EXPRESION	          { $$ = new NodeAst("Relacional", $1, count++);$$.listaIns.push($2);}
+          | EXPRESION mas EXPRESION	     {$$= new NodeAst("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION menos EXPRESION     {$$= new NodeAst("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION por EXPRESION		    {$$= new NodeAst("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION dividido EXPRESION	 {$$= new NodeAst("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION menorque EXPRESION	 {$$= new NodeAst("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION mayorque EXPRESION	{$$= new NodeAst("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION mayorigualque EXPRESION	 {$$= new NodeAst("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION menorigualque EXPRESION	  {$$= new NodeAst("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION igualdad EXPRESION	{$$= new NodeAst("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION distinto EXPRESION	{$$= new NodeAst("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION or EXPRESION	    {$$= new NodeAst("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION and EXPRESION	   {$$= new NodeAst("Relacional",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION potencia EXPRESION	{$$= new NodeAst("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | EXPRESION modulo EXPRESION	  {$$= new NodeAst("Artimetica",$2, count++);$$.listaIns.push($1);$$.listaIns.push($3);}
+          | decimal   { $$ = new NodeAst("Primitivo", $1, count++);}
+          | entero	  { $$ = new NodeAst("Primitivo", $1, count++);}
+          | true	  { $$ = new NodeAst("Primitivo", $1, count++);}
+          | false	  { $$ = new NodeAst("Primitivo", $1,  count++);}
+          | cadena    { $$ = new NodeAst("Primitivo", $1,  count++);}
+          | caracter  { $$ = new NodeAst("Primitivo", $1,  count++);}
+          | identificador pizquierdo LISTAEXPRESION pderecho 	{$$ = new NodeAst("Variable", $1, count++); $$.encontrarNodeAst($3)}
+          | identificador pizquierdo pderecho 		    { $$ = new NodeAst("Variable", $1, count++);}
+          | identificador	{ $$ = new NodeAst("Variable", $1,  count++);}
 
           ;
