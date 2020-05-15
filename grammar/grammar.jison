@@ -99,7 +99,7 @@
 
 
 
-([a-zA-Z]|[_])[a-zA-Z0-9_]* return 'identificador';
+([a-zA-Z]|[_])[a-zA-Z0-9_]* return 'IDENTIFICADOR';
 
 
 
@@ -129,17 +129,6 @@ INICIO : IMPORTSYCLASES EOF {$$=$1; return $$;}
         |error { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
 ;
 
-IMPORTSYCLASES: IMPORT2 CLASE2 {$$=new NodeAst("Raiz","Raiz",count++); $$.encontrarNodeAst($1);$$.listaIns.push($2);
-            |CLASE2 {$$ = new NodeAst("Raiz","Raiz",count++); $$.encontrarNodeAst($1); }
-            ;
-
-IMPORT2: IMPORT2 import identificador puntocoma {$$=$1;$$.push(new NodeAst("Import",$2+" "+$3,count++))}
-        |import identificador puntocoma {$$=[];$$.push(new NodeAst("Import",$1+" "+$2,count++))}
-        ;
-
-CLASE2 : class identificador BLOQUE_INSTRUCCIONESCLASE { $$ = new NodeAst("Clase", $1+" "+$2, count++);if($3!=null){$$.encontrarNodeAst($3)};}
-       ;
-
 INSTRUCCIONES : INSTRUCCIONES INSTRUCCION
               | INSTRUCCION
               ;
@@ -165,6 +154,15 @@ INICIO2: IMPORTSYCLASES {$$= new NodeAst("Raiz","Raiz",count++);$$.listaIns.push
     ;
 
 
+
+IMPORTSYCLASES: IMPORT2 CLASE2 {$$=new NodeAst("Raiz","Raiz",count++); $$.encontrarNodeAst($1);$$.listaIns.push($2);}
+            |CLASE2 {$$ = new NodeAst("Raiz","Raiz",count++); $$.listaIns.push($1);}
+            ;
+
+IMPORT2: IMPORT2 import IDENTIFICADOR puntocoma {$$=$1;$$.push(new NodeAst("Import",$2+" "+$3,count++))}
+        |import IDENTIFICADOR puntocoma {$$=[];$$.push(new NodeAst("Import",$1+" "+$2,count++))}
+        ;
+
 INSTRUCCIONESDENTROCLASE : INSTRUCCIONESDENTROCLASE INSTRUCCIONDENTROCLASE {$$=$1;$$.push($2)}
               | INSTRUCCIONDENTROCLASE   {$$=[];$$.push($1)}
               ;
@@ -187,7 +185,7 @@ INSTRUCCIONMETODO : PRINT {$$ = $1}
             | SWITCHM {$$ = $1}
             | DECLARACION {$$ = $1}
             | ASIGNACION {$$ = $1}
-            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
+            | IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
             | return puntocoma {$$ = new NodeAst("Sentencia",$1,count++);}
 
 ;
@@ -204,7 +202,7 @@ INSTRUCCIONFUNCION : PRINT {$$ = $1}
             | SWITCH2 {$$ = $1}
             | DECLARACION {$$ = $1}
             | ASIGNACION {$$ = $1}
-            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
+            | IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
 
 
 
@@ -220,7 +218,7 @@ INSTRUCCIONIF: PRINT {$$ = $1}
             | FOR2 {$$ = $1}
             | DO2 {$$ = $1}
             | SWITCH2 {$$ = $1}
-            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma  {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
+            | IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho puntocoma  {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
             | DECLARACION {$$ = $1}
             | ASIGNACION {$$ = $1}
             | return EXPRESION puntocoma { $$ = new NodeAst("Sentencia", $1,count++);$$.listaIns.push($2);}
@@ -238,7 +236,7 @@ INSTRUCCIONFOR: PRINT {$$ = $1}
             | SWITCH2 {$$ = $1}
             | break puntocoma { $$ = new NodeAst("Sentencia", $1,count++);}
             | continue puntocoma { $$ = new NodeAst("Sentencia", $1,count++);}
-            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
+            | IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
             | DECLARACION {$$ = $1}
             | ASIGNACION {$$ = $1}
             | return EXPRESION puntocoma { $$ = new NodeAst("Sentencia", $1,count++);$$.listaIns.push($2);}
@@ -256,7 +254,7 @@ INSTRUCCIONSWITCH: PRINT {$$ = $1}
             | DO2 {$$ = $1}
             | SWITCH2 {$$ = $1}
             | break puntocoma { $$ = new NodeAst("Sentencia", $1,count++);}
-            |identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
+            |IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
             |DECLARACION {$$ = $1}
             |ASIGNACION {$$ = $1}
             |return EXPRESION puntocoma { $$ = new NodeAst("Sentencia", $1,count++);$$.listaIns.push($2);}
@@ -267,15 +265,18 @@ LISTAEXPRESION: LISTAEXPRESION coma EXPRESION  {$$=$1;$$.push($3)}
                 ;
 
 
-FUNCION2: TIPO identificador pizquierdo PARAMETROS pderecho BLOQUE_INSTRUCCIONESFUNCION {$$=new NodeAst("Funcion",$1+" "+$2, count++);$$.encontrarNodeAst($4);if($6!=null){$$.encontrarNodeAst($6)};}
-        | TIPO identificador pizquierdo  pderecho BLOQUE_INSTRUCCIONESFUNCION {$$=new NodeAst("Funcion",$1+" "+$2, count++);if($5!=null){$$.encontrarNodeAst($5)};}
+FUNCION2: TIPO IDENTIFICADOR pizquierdo PARAMETROS pderecho BLOQUE_INSTRUCCIONESFUNCION {$$=new NodeAst("Funcion",$1+" "+$2, count++);$$.encontrarNodeAst($4);if($6!=null){$$.encontrarNodeAst($6)};}
+        | TIPO IDENTIFICADOR pizquierdo  pderecho BLOQUE_INSTRUCCIONESFUNCION {$$=new NodeAst("Funcion",$1+" "+$2, count++);if($5!=null){$$.encontrarNodeAst($5)};}
 
     ;
 
-METODO2 : void identificador pizquierdo PARAMETROS pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Metodo",$1+" "+$2,count++);$$.encontrarNodeAst($4);if($6!=null){$$.encontrarNodeAst($6)};}
-        | void identificador pizquierdo  pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Metodo",$1+" "+$2,count++);if($5!=null){$$.encontrarNodeAst($5)};}
+METODO2 : void IDENTIFICADOR pizquierdo PARAMETROS pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Metodo",$1+" "+$2,count++);$$.encontrarNodeAst($4);if($6!=null){$$.encontrarNodeAst($6)};}
+        | void IDENTIFICADOR pizquierdo  pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Metodo",$1+" "+$2,count++);if($5!=null){$$.encontrarNodeAst($5)};}
         |  void main pizquierdo pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Main",$1+" "+$2,count++);if($5!=null){$$.encontrarNodeAst($5)};}
 
+    ;
+
+CLASE2 : class IDENTIFICADOR BLOQUE_INSTRUCCIONESCLASE { $$ = new NodeAst("Clase", $1+" "+$2, count++);if($3!=null){$$.encontrarNodeAst($3)};}
     ;
 
 SWITCH2 : switch  CONDICION lizquierdo CASE2 lderecho {$$=new NodeAst("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNodeAst($4);}
@@ -299,8 +300,8 @@ FOR2 : for pizquierdo DECLARACION EXPRESION puntocoma CONDICIONFOR pderecho BLOQ
     ;
 
 
-CONDICIONFOR : identificador mas mas {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Incremento",$2+$3, count++));}
-     | identificador menos menos {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Decremento",$2+$3, count++));}
+CONDICIONFOR : IDENTIFICADOR mas mas {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Incremento",$2+$3, count++));}
+     | IDENTIFICADOR menos menos {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Decremento",$2+$3, count++));}
 ;
 
 TIPO : string {$$ = $1;}
@@ -317,14 +318,14 @@ DECLARACION : TIPO LISTAID igual EXPRESION puntocoma {$$=new NodeAst("Declaracio
 
 
 
-LISTAID: LISTAID coma identificador {$$=$1;$$.push(new NodeAst("Variable",$3, count++));}
-        |identificador {$$=[];$$.push(new NodeAst("Variable",$1, count++));}
+LISTAID: LISTAID coma IDENTIFICADOR {$$=$1;$$.push(new NodeAst("Variable",$3, count++));}
+        |IDENTIFICADOR {$$=[];$$.push(new NodeAst("Variable",$1, count++));}
         ;
 
 
-ASIGNACION : identificador igual EXPRESION puntocoma {$$=new NodeAst("Asignacion",$1, count++); $$.listaIns.push($3);}
-            | identificador mas mas puntocoma {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Incremento",$2+$3, count++));}
-            | identificador menos menos puntocoma {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Decremento",$2+$3, count++));}
+ASIGNACION : IDENTIFICADOR igual EXPRESION puntocoma {$$=new NodeAst("Asignacion",$1, count++); $$.listaIns.push($3);}
+            | IDENTIFICADOR mas mas puntocoma {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Incremento",$2+$3, count++));}
+            | IDENTIFICADOR menos menos puntocoma {$$ = new NodeAst("Asignacion",$1, count++); $$.listaIns.push(new NodeAst("Decremento",$2+$3, count++));}
     ;
 
 WHILE2 : while CONDICION BLOQUE_INSTRUCCIONESFOR { $$ = new NodeAst("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNodeAst($3)};}
@@ -354,7 +355,8 @@ BLOQUE_INSTRUCCIONESFOR : lizquierdo INSTRUCCIONESFOR lderecho  {$$=$2}
                      | lizquierdo lderecho {$$=null;}
                      ;
 
-BLOQUE_INSTRUCCIONESCLASE : lizquierdo INSTRUCCIONESDENTROCLASE FIN {$$=$2}
+
+BLOQUE_INSTRUCCIONESCLASE : lizquierdo INSTRUCCIONESDENTROCLASE lderecho {$$=$2}
                      | lizquierdo lderecho {$$=null;}
                      ;
 
@@ -370,8 +372,8 @@ PRINT : sout pizquierdo EXPRESION pderecho puntocoma { $$ = new NodeAst("Imprimi
     | soutln pizquierdo EXPRESION pderecho puntocoma { $$ = new NodeAst("Imprimir", $1, count++);$$.listaIns.push($3);}
       ;
 
-PARAMETROS : PARAMETROS coma TIPO identificador {$$=$1;$$.push(new NodeAst("Parametros",$3+" "+$4, count++));}
-        | TIPO identificador {$$=[];$$.push(new NodeAst("Parametros",$1+" "+$2, count++));}
+PARAMETROS : PARAMETROS coma TIPO IDENTIFICADOR {$$=$1;$$.push(new NodeAst("Parametros",$3+" "+$4, count++));}
+        | TIPO IDENTIFICADOR {$$=[];$$.push(new NodeAst("Parametros",$1+" "+$2, count++));}
         ;
 
 IFM:if CONDICION BLOQUE_INSTRUCCIONESIFM { $$ = new NodeAst("Sentencia", $1, count++);$$.listaIns.push($2); if($3!=null){$$.encontrarNodeAst($3)};}
@@ -393,7 +395,7 @@ INSTRUCCIONIFM: PRINT {$$ = $1}
             | FORM  {$$=$1}
             | DOM   {$$=$1}
             | SWITCHM  {$$=$1}
-            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1, count++); $$.encontrarNodeAst($3)}
+            | IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1, count++); $$.encontrarNodeAst($3)}
             | DECLARACION {$$=$1}
             | ASIGNACION {$$=$1}
             | return puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
@@ -424,7 +426,7 @@ INSTRUCCIONFORM: PRINT {$$ = $1}
             | SWITCHM {$$ = $1}
             | break puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
             | continue puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
-            | identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1, count++); $$.encontrarNodeAst($3)}
+            | IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1, count++); $$.encontrarNodeAst($3)}
             | DECLARACION {$$ = $1}
             | ASIGNACION {$$ = $1}
             | return puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
@@ -463,7 +465,7 @@ INSTRUCCIONSWITCHM: PRINT {$$ = $1}
             | DOM {$$ = $1}
             | SWITCHM {$$ = $1}
             | break puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
-            |identificador pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1, count++); $$.encontrarNodeAst($3)}
+            |IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1, count++); $$.encontrarNodeAst($3)}
             |DECLARACION {$$ = $1}
             |ASIGNACION {$$ = $1}
             |return puntocoma { $$ = new NodeAst("Sentencia", $1, count++);}
@@ -492,8 +494,8 @@ EXPRESION : menos EXPRESION %prec UMENOS
           | false	  { $$ = new NodeAst("Primitivo", $1,  count++);}
           | cadena    { $$ = new NodeAst("Primitivo", $1,  count++);}
           | caracter  { $$ = new NodeAst("Primitivo", $1,  count++);}
-          | identificador pizquierdo LISTAEXPRESION pderecho 	{$$ = new NodeAst("Variable", $1, count++); $$.encontrarNodeAst($3)}
-          | identificador pizquierdo pderecho 		    { $$ = new NodeAst("Variable", $1, count++);}
-          | identificador	{ $$ = new NodeAst("Variable", $1,  count++);}
+          | IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho 	{$$ = new NodeAst("Variable", $1, count++); $$.encontrarNodeAst($3)}
+          | IDENTIFICADOR pizquierdo pderecho 		    { $$ = new NodeAst("Variable", $1, count++);}
+          | IDENTIFICADOR	{ $$ = new NodeAst("Variable", $1,  count++);}
 
           ;
