@@ -6,7 +6,7 @@
 %{
     const {NodeAst} = require('../treeAST/NodeAst');
     var count = 0;
-    var prueba = "puto"
+    var prueba = "puto";
 %}
 
 
@@ -126,8 +126,13 @@
 %% /* Definición de la gramática */
 
 INICIO : IMPORTSYCLASES EOF {$$=$1; return $$;}
-        |error { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
 ;
+
+PANIC:  puntocoma
+      | lderecho
+      | error { console.error('Este es un error sintáctico general: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); }
+      ;
+
 
 INSTRUCCIONES : INSTRUCCIONES INSTRUCCION
               | INSTRUCCION
@@ -153,10 +158,8 @@ INSTRUCCIONCLASE : CLASE2
 INICIO2: IMPORTSYCLASES {$$= new NodeAst("Raiz","Raiz",count++);$$.listaIns.push($1)}
     ;
 
-
-
-IMPORTSYCLASES: IMPORT2 CLASE2 {$$=new NodeAst("Raiz","Raiz",count++); $$.encontrarNodeAst($1);$$.listaIns.push($2);}
-            |CLASE2 {$$ = new NodeAst("Raiz","Raiz",count++); $$.listaIns.push($1);}
+IMPORTSYCLASES: IMPORT2 CLASE2 {$$=new NodeAst("Raiz","Raiz",count++); $$.encontrarNodeAst($1);$$.encontrarNodeAst($2);}
+            |CLASE2 {$$ = new NodeAst("Raiz","Raiz",count++); $$.encontrarNodeAst($1);}
             ;
 
 IMPORT2: IMPORT2 import IDENTIFICADOR puntocoma {$$=$1;$$.push(new NodeAst("Import",$2+" "+$3,count++))}
@@ -170,7 +173,6 @@ INSTRUCCIONESDENTROCLASE : INSTRUCCIONESDENTROCLASE INSTRUCCIONDENTROCLASE {$$=$
 INSTRUCCIONDENTROCLASE : METODO2 {$$ = $1}
             | FUNCION2 {$$ = $1}
             | DECLARACION {$$ = $1}
-
 ;
 
 INSTRUCCIONESMETODO : INSTRUCCIONESMETODO INSTRUCCIONMETODO {$$=$1;$$.push($2)}
@@ -187,7 +189,6 @@ INSTRUCCIONMETODO : PRINT {$$ = $1}
             | ASIGNACION {$$ = $1}
             | IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
             | return puntocoma {$$ = new NodeAst("Sentencia",$1,count++);}
-
 ;
 
 INSTRUCCIONESFUNCION : INSTRUCCIONESFUNCION INSTRUCCIONFUNCION {$$=$1;$$.push($2)}
@@ -203,8 +204,6 @@ INSTRUCCIONFUNCION : PRINT {$$ = $1}
             | DECLARACION {$$ = $1}
             | ASIGNACION {$$ = $1}
             | IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho puntocoma {$$ = new NodeAst("Sentencia", $1,count++); $$.encontrarNodeAst($3)}
-
-
 
 ;
 
@@ -272,16 +271,15 @@ FUNCION2: TIPO IDENTIFICADOR pizquierdo PARAMETROS pderecho BLOQUE_INSTRUCCIONES
 
 METODO2 : void IDENTIFICADOR pizquierdo PARAMETROS pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Metodo",$1+" "+$2,count++);$$.encontrarNodeAst($4);if($6!=null){$$.encontrarNodeAst($6)};}
         | void IDENTIFICADOR pizquierdo  pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Metodo",$1+" "+$2,count++);if($5!=null){$$.encontrarNodeAst($5)};}
-        |  void main pizquierdo pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Main",$1+" "+$2,count++);if($5!=null){$$.encontrarNodeAst($5)};}
-
+        | void main pizquierdo pderecho BLOQUE_INSTRUCCIONESMETODO {$$=new NodeAst("Main",$1+" "+$2,count++);if($5!=null){$$.encontrarNodeAst($5)};}
     ;
 
-CLASE2 : class IDENTIFICADOR BLOQUE_INSTRUCCIONESCLASE { $$ = new NodeAst("Clase", $1+" "+$2, count++);if($3!=null){$$.encontrarNodeAst($3)};}
+CLASE2 : CLASE2 class IDENTIFICADOR BLOQUE_INSTRUCCIONESCLASE { $$= $1; let y = new NodeAst("Clase", $2+" "+$3, count++);  if($4!=null){y.encontrarNodeAst($4)}; $$.push(y); }
+       | class IDENTIFICADOR BLOQUE_INSTRUCCIONESCLASE { $$ = [] ; let x = new NodeAst("Clase", $1+" "+$2, count++);if($3!=null){x.encontrarNodeAst($3)}; $$.push(x);}
     ;
 
 SWITCH2 : switch  CONDICION lizquierdo CASE2 lderecho {$$=new NodeAst("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNodeAst($4);}
         | switch CONDICION lizquierdo CASE2 DEFAULT2 lderecho {$$=new NodeAst("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNodeAst($4);$$.listaIns.push($5);}
-
     ;
 
 CASE2: CASE2 case EXPRESION dospuntos INSTRUCCIONESSWITCH {$$=$1;$$.push(new NodeAst("Sentencia",$2, count++));$$[$$.length-1].listaIns.push($3);if($5!=null){$$[$$.length-1].encontrarNodeAst($5)};}
@@ -289,7 +287,6 @@ CASE2: CASE2 case EXPRESION dospuntos INSTRUCCIONESSWITCH {$$=$1;$$.push(new Nod
     ;
 
 DEFAULT2:  default dospuntos  INSTRUCCIONESSWITCH {$$=new NodeAst("Sentencia",$1, count++);if($3!=null){$$.encontrarNodeAst($3)};}
-
     ;
 
 DO2 : do BLOQUE_INSTRUCCIONESFOR while CONDICION puntocoma {$$=new NodeAst("Sentencia",$1+$3, count++);if($2!=null){$$.encontrarNodeAst($2)};$$.listaIns.push($4);}
@@ -315,7 +312,6 @@ DECLARACION : TIPO LISTAID igual EXPRESION puntocoma {$$=new NodeAst("Declaracio
             | TIPO LISTAID puntocoma {$$=new NodeAst("Declaracion",$1, count++); $$.encontrarNodeAst($2);}
             |
             ;
-
 
 
 LISTAID: LISTAID coma IDENTIFICADOR {$$=$1;$$.push(new NodeAst("Variable",$3, count++));}
@@ -442,7 +438,6 @@ DOM : do BLOQUE_INSTRUCCIONESFORM while CONDICION puntocoma {$$=new NodeAst("Sen
 
 SWITCHM : switch  CONDICION lizquierdo CASEM lderecho {$$=new NodeAst("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNodeAst($4);}
         | switch CONDICION lizquierdo CASEM DEFAULTM lderecho {$$=new NodeAst("Sentencia",$1, count++);$$.listaIns.push($2);$$.encontrarNodeAst($4);$$.listaIns.push($5);}
-
     ;
 
 CASEM: CASEM case EXPRESION dospuntos INSTRUCCIONESSWITCHM {$$=$1;$$.push(new NodeAst("Sentencia",$2, count++));$$[$$.length-1].listaIns.push($3);if($5!=null){$$[$$.length-1].encontrarNodeAst($5)};}
@@ -451,7 +446,6 @@ CASEM: CASEM case EXPRESION dospuntos INSTRUCCIONESSWITCHM {$$=$1;$$.push(new No
 
 
 DEFAULTM:  default dospuntos  INSTRUCCIONESSWITCHM {$$=new NodeAst("Sentencia",$1, count++);if($3!=null){$$.encontrarNodeAst($3)};}
-
     ;
 
 INSTRUCCIONESSWITCHM: INSTRUCCIONESSWITCHM INSTRUCCIONSWITCHM {$$=$1;$$.push($2)}
@@ -497,5 +491,6 @@ EXPRESION : menos EXPRESION %prec UMENOS
           | IDENTIFICADOR pizquierdo LISTAEXPRESION pderecho 	{$$ = new NodeAst("Variable", $1, count++); $$.encontrarNodeAst($3)}
           | IDENTIFICADOR pizquierdo pderecho 		    { $$ = new NodeAst("Variable", $1, count++);}
           | IDENTIFICADOR	{ $$ = new NodeAst("Variable", $1,  count++);}
-
+          | PANIC EXPRESION { console.error('Este es un error sintáctico: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); $$ = new NodeAst("Error", $1,  count++);}
           ;
+
