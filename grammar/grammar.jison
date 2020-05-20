@@ -6,7 +6,7 @@
 %{
     const {NodeAst} = require('../treeAST/NodeAst');
     const {ErrorAst} = require('../treeAST/ErrorAst');
-    const listError = [];
+    var listError = [];
 
     var count = 1;
     const vacio =  new NodeAst("Raiz","Raiz",0);
@@ -130,12 +130,12 @@
 
 %% /* Definición de la gramática */
 
-INICIO : IMPORTSYCLASES EOF { $$=$1; return[$$,listError];}
-        | ERROR { $$=$1;  return[,$$];}
+INICIO : IMPORTSYCLASES EOF { $$=$1; var le=listError;  listError=[]; return[$$,le];}
+        | ERROR { $$=$1;  listError=[]; count=0; return[,$$];}
         ;
 
 ERROR: | ERROR error { $$=$1; $$.push(new ErrorAst("Error Sintactico", yytext, this._$.first_line, this._$.first_column)); }
-       | error {$$=[]; $$.push(new ErrorAst("Error Sintactico", yytext, this._$.first_line, this._$.first_column)); }
+       | error {$$=listError; $$.push(new ErrorAst("Error Sintactico", yytext, this._$.first_line, this._$.first_column)); }
        ;
 
 PANIC:  puntocoma

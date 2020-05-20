@@ -84,16 +84,16 @@ performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* actio
 var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
- this.$=$$[$0-1]; return[this.$,listError];
+ this.$=$$[$0-1]; var le=listError;  listError=[]; return[this.$,le];
 break;
 case 2:
- this.$=$$[$0];  return[,this.$];
+ this.$=$$[$0];  listError=[]; count=0; return[,this.$];
 break;
 case 4:
  this.$=$$[$0-1]; this.$.push(new ErrorAst("Error Sintactico", yytext, this._$.first_line, this._$.first_column)); 
 break;
 case 5:
-this.$=[]; this.$.push(new ErrorAst("Error Sintactico", yytext, this._$.first_line, this._$.first_column)); 
+this.$=listError; this.$.push(new ErrorAst("Error Sintactico", yytext, this._$.first_line, this._$.first_column)); 
 break;
 case 8:
 listError.push(new ErrorAst("Error Sintactico", yytext, this._$.first_line, this._$.first_column));
@@ -550,7 +550,7 @@ _handle_error:
 
     const {NodeAst} = require('../treeAST/NodeAst');
     const {ErrorAst} = require('../treeAST/ErrorAst');
-    const listError = [];
+    var listError = [];
 
     var count = 1;
     const vacio =  new NodeAst("Raiz","Raiz",0);
