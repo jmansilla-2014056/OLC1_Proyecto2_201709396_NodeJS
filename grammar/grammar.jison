@@ -6,11 +6,12 @@
 %{
     const {NodeAst} = require('../treeAST/NodeAst');
     const {ErrorAst} = require('../treeAST/ErrorAst');
-    let listError = [];
+    const listError = [];
 
     var count = 1;
     const vacio =  new NodeAst("Raiz","Raiz",0);
     var prueba = "puto";
+
 %}
 
 
@@ -129,9 +130,13 @@
 
 %% /* Definición de la gramática */
 
-INICIO : IMPORTSYCLASES EOF { $$=$1; if(listError.length > 0){return [listError];}else{return[$$,listError];}}
-        | error { console.error('Este es un error sintáctico general: ' + yytext + ', en la linea: ' + this._$.first_line + ', en la columna: ' + this._$.first_column); listError.push(new ErrorAst("Error Sintactico", yytext, this._$.first_line, this._$.first_column));  listError.forEach(element => console.log(element));}
+INICIO : IMPORTSYCLASES EOF { $$=$1; return[$$,listError];}
+        | ERROR { $$=$1;  return[,$$];}
         ;
+
+ERROR: | ERROR error { $$=$1; $$.push(new ErrorAst("Error Sintactico", yytext, this._$.first_line, this._$.first_column)); }
+       | error {$$=[]; $$.push(new ErrorAst("Error Sintactico", yytext, this._$.first_line, this._$.first_column)); }
+       ;
 
 PANIC:  puntocoma
       | lderecho

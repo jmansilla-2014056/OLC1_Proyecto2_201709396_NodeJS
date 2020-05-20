@@ -17,21 +17,23 @@ router.get('/', function(req, res, next) {
 router.post('/',  (req, res)=> {
     console.log(req.body.llave);
 try {
-    var errores;
-    var ast;
     var temp = enter(req.body.llave);
-
-    if(temp.length === 2){
-        ast = temp[0];
-        errores = temp[1];
+    var  ast;
+    var err;
+    if(temp[0] === undefined) {
+        ast = new NodeAst("Raiz", "Raiz", 0);
     }else{
-        errores = temp[1];
-        console.log(errores);
-        ast = new NodeAst("Raiz","Raiz",0);
+        ast = temp[0];
+    }
+
+    if(temp[1] === undefined){
+        err = [];
+    }else{
+        err = temp[1];
     }
 
     var jsonAst = (JSON.stringify(ast, null, 2));
-    var jsonError = (JSON.stringify(errores, null, 2));
+    var jsonError = (JSON.stringify(err, null, 2));
 
     jsonAst = jsonAst.split('nombre1').join('text').split('listaIns').join('children');
 
