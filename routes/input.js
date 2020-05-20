@@ -1,3 +1,4 @@
+const {NodeAst} = require('../treeAST/NodeAst');
 var express = require('express');
 var parser = require('../grammar/grammar').parser;
 
@@ -15,15 +16,36 @@ router.get('/', function(req, res, next) {
 
 router.post('/',  (req, res)=> {
     console.log(req.body.llave);
+try {
+    var errores;
+    var ast;
     var temp = enter(req.body.llave);
-    var jsonG =(JSON.stringify(temp,null,2));
 
-    jsonG = jsonG.split('nombre1').join('text').split('listaIns').join('children');
-    console.log(jsonG);
+    if(temp.length === 2){
+        ast = temp[0];
+        errores = temp[1];
+    }else{
+        errores = temp[1];
+        console.log(errores);
+        ast = new NodeAst("Raiz","Raiz",0);
+    }
 
-    var result1 = JSON.parse(jsonG);
+    var jsonAst = (JSON.stringify(ast, null, 2));
+    var jsonError = (JSON.stringify(errores, null, 2));
 
-    res.json({tree: result1});
+    jsonAst = jsonAst.split('nombre1').join('text').split('listaIns').join('children');
+
+    console.log("------------------------JSONERROR----------------------------");
+    console.log(jsonError);
+    console.log("-------------------------JSONAST-----------------------------");
+    console.log(jsonAst);
+}catch (e) {
+    console.error(e);
+}
+    //var result1 = JSON.parse(jsonAst);
+    //var result2 = JSON.parse(jsonError);
+
+    res.json({tree: jsonAst, errores: jsonError});
 });
 
 module.exports = router;
