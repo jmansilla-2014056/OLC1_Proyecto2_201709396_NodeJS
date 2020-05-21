@@ -1,7 +1,10 @@
 const {NodeAst} = require('../treeAST/NodeAst');
 const {ErrorAst} = require("../treeAST/ErrorAst");
+const {ClassReport} = require("../reports/ClassReport");
+
 var express = require('express');
 var parser = require('../grammar/grammar').parser;
+
 
 function enter(input) {
     return parser.parse(input);
@@ -54,6 +57,9 @@ try {
 
     var jsonAst2 = (JSON.stringify(ast2, null, 2));
     var jsonError2 = (JSON.stringify(err2, null, 2));
+
+    var nuevo = new ClassReport(ast1,ast2);
+
 
     jsonAst2 = jsonAst2.split('nombre1').join('text').split('listaIns').join('children');
 

@@ -1,6 +1,6 @@
 export class NodeAst{
     //>>> tsc -w
-    public listaIns:Array<Node>;
+    public listaIns:Array<NodeAst>;
     public tipo1: string;
     public nombre1: string;
     public id: number;
@@ -12,7 +12,7 @@ export class NodeAst{
         this.id = id;
     }
 
-    encontrarNodeAst(listaNodo:Array<Node>){
+    encontrarNodeAst(listaNodo:Array<NodeAst>){
         for(let i=0;i<listaNodo.length;i++){
             this.listaIns.push(listaNodo[i]);
         }
