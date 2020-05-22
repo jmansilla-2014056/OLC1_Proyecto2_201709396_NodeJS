@@ -58,6 +58,9 @@ try {
     var jsonAst2 = (JSON.stringify(ast2, null, 2));
     var jsonError2 = (JSON.stringify(err2, null, 2));
 
+    console.log(jsonAst1);
+
+
     var nuevo = new ClassReport(ast1,ast2);
 
 

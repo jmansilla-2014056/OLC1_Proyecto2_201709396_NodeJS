@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var FuncionReport_1 = require("./FuncionReport");
 var ClassReport = /** @class */ (function () {
     function ClassReport(ast1, ast2) {
         this.clases1 = [];
@@ -9,6 +10,8 @@ var ClassReport = /** @class */ (function () {
         this.compararClases(ast1, ast2);
     }
     ClassReport.prototype.compararClases = function (ast1, ast2) {
+        this.clases2 = [];
+        this.clases1 = [];
         this.treeclass(ast1);
         this.clases2 = this.clases1;
         this.clases1 = [];
@@ -16,12 +19,14 @@ var ClassReport = /** @class */ (function () {
         this.copyclass(this.clases1, this.clases2);
     };
     ClassReport.prototype.copyclass = function (clases1, clasese2) {
+        console.log("-----------------REPORTE 1------------------");
         for (var _i = 0, clases1_1 = clases1; _i < clases1_1.length; _i++) {
             var a = clases1_1[_i];
             for (var _a = 0, clasese2_1 = clasese2; _a < clasese2_1.length; _a++) {
                 var b = clasese2_1[_a];
                 if (a.nombre1 == b.nombre1) {
-                    console.log("se detecto una clase copia" + a.nombre1);
+                    var fr = new FuncionReport_1.FuncionReport();
+                    fr.compararFuncion(a, b);
                 }
             }
         }
