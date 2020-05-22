@@ -60,9 +60,10 @@ try {
 
     console.log(jsonAst1);
 
+    var nuevo = new ClassReport();
+    nuevo.compararClases(ast1,ast2);
 
-    var nuevo = new ClassReport(ast1,ast2);
-
+    var reporteClases =   (JSON.stringify(nuevo.reporte, null, 2));
 
     jsonAst2 = jsonAst2.split('nombre1').join('text').split('listaIns').join('children');
 
@@ -70,7 +71,7 @@ try {
     console.error(e);
 }
 
-    res.json({tree1: jsonAst1, errores1: jsonError1, tree2: jsonAst2, errores2: jsonError2});
+    res.json({tree1: jsonAst1, errores1: jsonError1, tree2: jsonAst2, errores2: jsonError2, clases: reporteClases});
 });
 
 module.exports = router;

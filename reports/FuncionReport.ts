@@ -1,4 +1,5 @@
 import {NodeAst} from "../treeAST/NodeAst";
+import {Clase} from "../treeAST/Clase";
 
 export class FuncionReport {
     //Funciones de ambas clases
@@ -8,15 +9,77 @@ export class FuncionReport {
     public parametros1: Array<NodeAst>;
     public parametros2: Array<NodeAst>;
 
+    public report1: Clase;
+    public report2: Clase;
+
+    public class1: NodeAst;
+    public class2: NodeAst;
+
     constructor(){
         this.funciones1 = [];
         this.funciones2 = [];
         this.parametros1 = [];
         this.parametros2 = [];
-
+        this.report1 = new Clase('', 0,0);
+        this.report2 = new Clase('', 0,0);
+        this.class1 = new NodeAst('','',0);
+        this.class2 = new NodeAst('','',0);
     }
 
+
+    llenarReporte(){
+        this.report1 = new Clase(this.class1.nombre1,this.contarMetodos1(),this.contarFunciones1());
+        this.report2 = new Clase(this.class2.nombre1 + "(Copia)",this.contarMetodos2(),this.contarFunciones2());
+    }
+
+    contarFunciones1(){
+        let contador:number = 0;
+        for(let a of this.funciones1){
+            if(a.tipo1=="Funcion"){
+                contador++;
+            }
+        }
+        return contador;
+    }
+
+
+    contarFunciones2(){
+        let contador:number = 0;
+        for(let a of this.funciones2){
+            if(a.tipo1=="Funcion"){
+                contador++;
+            }
+        }
+        return contador;
+    }
+
+    contarMetodos1(){
+        let contador:number = 0;
+        for(let a of this.funciones1){
+            if(a.tipo1=="Metodo" || a.tipo1=="Main"){
+                contador++;
+            }
+        }
+        return contador;
+    }
+
+
+    contarMetodos2(){
+        let contador:number = 0;
+        for(let a of this.funciones2){
+            if(a.tipo1=="Metodo" || a.tipo1=="Main"){
+                contador++;
+            }
+        }
+        return contador;
+    }
+
+
+
+
     compararFuncion(class1: NodeAst, class2: NodeAst ){
+        this.class1 = class1;
+        this.class2 = class2;
         console.log("---------------------REPORTE 2-----------------------");
         console.log("CLASE: "+ class1.nombre1);
         this.funciones1 = [];
@@ -37,7 +100,7 @@ export class FuncionReport {
         for(let a of funciones1){
             for(let b of funciones2) {
                 let bandera: boolean = false;
-                // Que sean del mismo tipo
+                // Que sean del mismo tipo retorno
                 if(a.nombre1.indexOf('void')  >= 0 && b.nombre1.indexOf('void')  >= 0){
                    bandera = true;
                 }else if(a.nombre1.indexOf('int') >= 0 && b.nombre1.indexOf('int') >= 0){
@@ -75,7 +138,7 @@ export class FuncionReport {
 
 
     funcCopy(p1:  Array<NodeAst>, p2: Array<NodeAst>){
-
+        //Sin parametros
         if(p1.length == p2.length && p1.length == 0 ){
             return true;
         }
@@ -113,7 +176,6 @@ export class FuncionReport {
     treeparameters(temporal: NodeAst){
         if(temporal != null){
             if(temporal.listaIns != null && temporal.listaIns.length > 0){
-
                 for(let i=0;i<temporal.listaIns.length;i++){
                     if(temporal.listaIns[i].tipo1 == "Parametros"){
                         this.parametros1.push(temporal.listaIns[i]);

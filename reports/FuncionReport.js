@@ -1,13 +1,65 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var NodeAst_1 = require("../treeAST/NodeAst");
+var Clase_1 = require("../treeAST/Clase");
 var FuncionReport = /** @class */ (function () {
     function FuncionReport() {
         this.funciones1 = [];
         this.funciones2 = [];
         this.parametros1 = [];
         this.parametros2 = [];
+        this.report1 = new Clase_1.Clase('', 0, 0);
+        this.report2 = new Clase_1.Clase('', 0, 0);
+        this.class1 = new NodeAst_1.NodeAst('', '', 0);
+        this.class2 = new NodeAst_1.NodeAst('', '', 0);
     }
+    FuncionReport.prototype.llenarReporte = function () {
+        this.report1 = new Clase_1.Clase(this.class1.nombre1, this.contarMetodos1(), this.contarFunciones1());
+        this.report2 = new Clase_1.Clase(this.class2.nombre1 + "(Copia)", this.contarMetodos2(), this.contarFunciones2());
+    };
+    FuncionReport.prototype.contarFunciones1 = function () {
+        var contador = 0;
+        for (var _i = 0, _a = this.funciones1; _i < _a.length; _i++) {
+            var a = _a[_i];
+            if (a.tipo1 == "Funcion") {
+                contador++;
+            }
+        }
+        return contador;
+    };
+    FuncionReport.prototype.contarFunciones2 = function () {
+        var contador = 0;
+        for (var _i = 0, _a = this.funciones2; _i < _a.length; _i++) {
+            var a = _a[_i];
+            if (a.tipo1 == "Funcion") {
+                contador++;
+            }
+        }
+        return contador;
+    };
+    FuncionReport.prototype.contarMetodos1 = function () {
+        var contador = 0;
+        for (var _i = 0, _a = this.funciones1; _i < _a.length; _i++) {
+            var a = _a[_i];
+            if (a.tipo1 == "Metodo" || a.tipo1 == "Main") {
+                contador++;
+            }
+        }
+        return contador;
+    };
+    FuncionReport.prototype.contarMetodos2 = function () {
+        var contador = 0;
+        for (var _i = 0, _a = this.funciones2; _i < _a.length; _i++) {
+            var a = _a[_i];
+            if (a.tipo1 == "Metodo" || a.tipo1 == "Main") {
+                contador++;
+            }
+        }
+        return contador;
+    };
     FuncionReport.prototype.compararFuncion = function (class1, class2) {
+        this.class1 = class1;
+        this.class2 = class2;
         console.log("---------------------REPORTE 2-----------------------");
         console.log("CLASE: " + class1.nombre1);
         this.funciones1 = [];
@@ -26,7 +78,7 @@ var FuncionReport = /** @class */ (function () {
             for (var _a = 0, funciones2_1 = funciones2; _a < funciones2_1.length; _a++) {
                 var b = funciones2_1[_a];
                 var bandera = false;
-                // Que sean del mismo tipo
+                // Que sean del mismo tipo retorno
                 if (a.nombre1.indexOf('void') >= 0 && b.nombre1.indexOf('void') >= 0) {
                     bandera = true;
                 }
@@ -63,6 +115,7 @@ var FuncionReport = /** @class */ (function () {
         }
     };
     FuncionReport.prototype.funcCopy = function (p1, p2) {
+        //Sin parametros
         if (p1.length == p2.length && p1.length == 0) {
             return true;
         }

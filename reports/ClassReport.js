@@ -2,12 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var FuncionReport_1 = require("./FuncionReport");
 var ClassReport = /** @class */ (function () {
-    function ClassReport(ast1, ast2) {
+    function ClassReport() {
         this.clases1 = [];
         this.clases2 = [];
         this.copiasclase1 = [];
         this.copiasclase2 = [];
-        this.compararClases(ast1, ast2);
+        this.reporte = [];
     }
     ClassReport.prototype.compararClases = function (ast1, ast2) {
         this.clases2 = [];
@@ -27,6 +27,9 @@ var ClassReport = /** @class */ (function () {
                 if (a.nombre1 == b.nombre1) {
                     var fr = new FuncionReport_1.FuncionReport();
                     fr.compararFuncion(a, b);
+                    fr.llenarReporte();
+                    this.reporte.push(fr.report1);
+                    this.reporte.push(fr.report2);
                 }
             }
         }
