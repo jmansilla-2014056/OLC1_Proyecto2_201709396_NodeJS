@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var NodeAst_1 = require("../treeAST/NodeAst");
 var Clase_1 = require("../treeAST/Clase");
+var Funcion_1 = require("../treeAST/Funcion");
+var Variable_1 = require("../treeAST/Variable");
 var FuncionReport = /** @class */ (function () {
     function FuncionReport() {
         this.funciones1 = [];
@@ -12,6 +14,12 @@ var FuncionReport = /** @class */ (function () {
         this.report2 = new Clase_1.Clase('', 0, 0);
         this.class1 = new NodeAst_1.NodeAst('', '', 0);
         this.class2 = new NodeAst_1.NodeAst('', '', 0);
+        this.reportesFuncion = [];
+        this.reportesvariables = [];
+        this.vars1 = [];
+        this.vars2 = [];
+        this.dec1 = [];
+        this.dec2 = [];
     }
     FuncionReport.prototype.llenarReporte = function () {
         this.report1 = new Clase_1.Clase(this.class1.nombre1, this.contarMetodos1(), this.contarFunciones1());
@@ -108,6 +116,43 @@ var FuncionReport = /** @class */ (function () {
                     this.treeparameters(b);
                     //Finalmente se comprueba
                     if (this.funcCopy(this.parametros1, this.parametros2)) {
+                        var concat1 = [];
+                        var concat2 = [];
+                        for (var _b = 0, _c = this.parametros1; _b < _c.length; _b++) {
+                            var x = _c[_b];
+                            concat1.push(x.nombre1);
+                        }
+                        for (var _d = 0, _e = this.parametros2; _d < _e.length; _d++) {
+                            var y = _e[_d];
+                            concat2.push(y.nombre1);
+                        }
+                        this.reportesFuncion.push(new Funcion_1.Funcion(this.class1.nombre1, a.nombre1, b.nombre1, concat1, concat2));
+                        // Proceder a ver si hay copia de variables
+                        this.dec1 = [];
+                        this.dec2 = [];
+                        this.declaraciones1(a);
+                        this.declaraciones2(b);
+                        for (var _f = 0, _g = this.dec1; _f < _g.length; _f++) {
+                            var x = _g[_f];
+                            for (var _h = 0, _j = this.dec2; _h < _j.length; _h++) {
+                                var y = _j[_h];
+                                if (x.nombre1 == y.nombre1) {
+                                    this.vars1 = [];
+                                    this.vars2 = [];
+                                    this.variables1(x);
+                                    this.variables2(y);
+                                    for (var _k = 0, _l = this.vars1; _k < _l.length; _k++) {
+                                        var i = _l[_k];
+                                        for (var _m = 0, _o = this.vars2; _m < _o.length; _m++) {
+                                            var j = _o[_m];
+                                            if (i.nombre1 == j.nombre1) {
+                                                this.reportesvariables.push(new Variable_1.Variable(this.class1.nombre1, a.nombre1, b.nombre1, x.nombre1, i.nombre1, j.nombre1));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         console.log("El metodo o funcion :" + a.nombre1 + " es una copia");
                     }
                 }
@@ -172,6 +217,54 @@ var FuncionReport = /** @class */ (function () {
                         this.funciones1.push(temporal.listaIns[i]);
                     }
                     this.treefunc(temporal.listaIns[i]);
+                }
+            }
+        }
+    };
+    FuncionReport.prototype.declaraciones1 = function (temporal) {
+        if (temporal != null) {
+            if (temporal.listaIns != null && temporal.listaIns.length > 0) {
+                for (var i = 0; i < temporal.listaIns.length; i++) {
+                    if (temporal.listaIns[i].tipo1 == "Declaracion") {
+                        this.dec1.push(temporal.listaIns[i]);
+                    }
+                    this.declaraciones1(temporal.listaIns[i]);
+                }
+            }
+        }
+    };
+    FuncionReport.prototype.declaraciones2 = function (temporal) {
+        if (temporal != null) {
+            if (temporal.listaIns != null && temporal.listaIns.length > 0) {
+                for (var i = 0; i < temporal.listaIns.length; i++) {
+                    if (temporal.listaIns[i].tipo1 == "Declaracion") {
+                        this.dec2.push(temporal.listaIns[i]);
+                    }
+                    this.declaraciones2(temporal.listaIns[i]);
+                }
+            }
+        }
+    };
+    FuncionReport.prototype.variables1 = function (temporal) {
+        if (temporal != null) {
+            if (temporal.listaIns != null && temporal.listaIns.length > 0) {
+                for (var i = 0; i < temporal.listaIns.length; i++) {
+                    if (temporal.listaIns[i].tipo1 == "Variable") {
+                        this.vars1.push(temporal.listaIns[i]);
+                    }
+                    this.variables1(temporal.listaIns[i]);
+                }
+            }
+        }
+    };
+    FuncionReport.prototype.variables2 = function (temporal) {
+        if (temporal != null) {
+            if (temporal.listaIns != null && temporal.listaIns.length > 0) {
+                for (var i = 0; i < temporal.listaIns.length; i++) {
+                    if (temporal.listaIns[i].tipo1 == "Variable") {
+                        this.vars2.push(temporal.listaIns[i]);
+                    }
+                    this.variables2(temporal.listaIns[i]);
                 }
             }
         }

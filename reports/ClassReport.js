@@ -8,6 +8,8 @@ var ClassReport = /** @class */ (function () {
         this.copiasclase1 = [];
         this.copiasclase2 = [];
         this.reporte = [];
+        this.reportef = [];
+        this.reportev = [];
     }
     ClassReport.prototype.compararClases = function (ast1, ast2) {
         this.clases2 = [];
@@ -30,6 +32,14 @@ var ClassReport = /** @class */ (function () {
                     fr.llenarReporte();
                     this.reporte.push(fr.report1);
                     this.reporte.push(fr.report2);
+                    for (var _b = 0, _c = fr.reportesFuncion; _b < _c.length; _b++) {
+                        var g = _c[_b];
+                        this.reportef.push(g);
+                    }
+                    for (var _d = 0, _e = fr.reportesvariables; _d < _e.length; _d++) {
+                        var m = _e[_d];
+                        this.reportev.push(m);
+                    }
                 }
             }
         }

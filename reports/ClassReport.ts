@@ -1,6 +1,8 @@
 import {NodeAst} from "../treeAST/NodeAst";
 import {FuncionReport} from "./FuncionReport";
 import {Clase} from "../treeAST/Clase";
+import {Funcion} from "../treeAST/Funcion";
+import {Variable} from "../treeAST/Variable";
 
 export class ClassReport {
 
@@ -9,13 +11,17 @@ export class ClassReport {
   public copiasclase1: Array<NodeAst>;
   public copiasclase2: Array<NodeAst>;
   public reporte: Array<Clase>;
+  public reportef: Array<Funcion>;
+  public reportev: Array<Variable>;
 
  constructor(){
      this.clases1 = [];
      this.clases2 = [];
      this.copiasclase1 = [];
      this.copiasclase2 = [];
-     this.reporte = []
+     this.reporte = [];
+     this.reportef = [];
+     this.reportev = [];
  }
 
  compararClases(ast1: NodeAst, ast2: NodeAst ){
@@ -39,6 +45,14 @@ export class ClassReport {
                     fr.llenarReporte();
                     this.reporte.push(fr.report1);
                     this.reporte.push(fr.report2);
+
+                    for(let g of fr.reportesFuncion){
+                        this.reportef.push(g);
+                    }
+
+                    for(let m of fr.reportesvariables){
+                        this.reportev.push(m);
+                    }
                 }
             }
         }

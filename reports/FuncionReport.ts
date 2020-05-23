@@ -1,5 +1,7 @@
 import {NodeAst} from "../treeAST/NodeAst";
 import {Clase} from "../treeAST/Clase";
+import {Funcion} from "../treeAST/Funcion";
+import {Variable} from "../treeAST/Variable";
 
 export class FuncionReport {
     //Funciones de ambas clases
@@ -15,6 +17,18 @@ export class FuncionReport {
     public class1: NodeAst;
     public class2: NodeAst;
 
+    //Reporte de la funcion
+    public reportesFuncion: Array<Funcion>;
+
+    //Reporte Variables
+    public reportesvariables: Array<Variable>;
+
+    public vars1: Array<NodeAst>;
+    public vars2: Array<NodeAst>;
+
+    public dec1: Array<NodeAst>;
+    public dec2: Array<NodeAst>;
+
     constructor(){
         this.funciones1 = [];
         this.funciones2 = [];
@@ -24,6 +38,12 @@ export class FuncionReport {
         this.report2 = new Clase('', 0,0);
         this.class1 = new NodeAst('','',0);
         this.class2 = new NodeAst('','',0);
+        this.reportesFuncion = [];
+        this.reportesvariables = [];
+        this.vars1 = [];
+        this.vars2 = [];
+        this.dec1 = [];
+        this.dec2 = [];
     }
 
 
@@ -73,8 +93,6 @@ export class FuncionReport {
         }
         return contador;
     }
-
-
 
 
     compararFuncion(class1: NodeAst, class2: NodeAst ){
@@ -127,14 +145,56 @@ export class FuncionReport {
 
                     //Finalmente se comprueba
                     if(this.funcCopy(this.parametros1, this.parametros2)){
+
+                        let concat1: Array<string>=[];
+                        let concat2: Array<string>=[];
+
+                        for(let x of this.parametros1){
+                            concat1.push(x.nombre1);
+                        }
+
+                        for(let y of this.parametros2){
+                            concat2.push(y.nombre1);
+                        }
+
+                        this.reportesFuncion.push(new Funcion(this.class1.nombre1, a.nombre1, b.nombre1, concat1,concat2));
+
+                        // Proceder a ver si hay copia de variables
+                        this.dec1 = [];
+                        this.dec2 = [];
+                        this.declaraciones1(a);
+                        this.declaraciones2(b);
+
+                        for(let x of this.dec1){
+                            for(let y of this.dec2){
+                                if(x.nombre1 == y.nombre1){
+
+                                    this.vars1 =[];
+                                    this.vars2 =[];
+                                    this.variables1(x);
+                                    this.variables2(y);
+
+                                    for(let i of this.vars1) {
+                                        for (let j of this.vars2) {
+                                            if(i.nombre1 == j.nombre1){
+
+                                                this.reportesvariables.push(new Variable(this.class1.nombre1,a.nombre1,b.nombre1, x.nombre1, i.nombre1, j.nombre1));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         console.log("El metodo o funcion :" + a.nombre1 + " es una copia");
                     }
-
                 }
-
             }
         }
     }
+
+
+
+
 
 
     funcCopy(p1:  Array<NodeAst>, p2: Array<NodeAst>){
@@ -200,5 +260,61 @@ export class FuncionReport {
             }
         }
     }
+
+
+    declaraciones1(temporal: NodeAst){
+        if(temporal != null){
+            if(temporal.listaIns != null && temporal.listaIns.length > 0){
+                for(let i=0;i<temporal.listaIns.length;i++){
+                    if(temporal.listaIns[i].tipo1 == "Declaracion"){
+                        this.dec1.push(temporal.listaIns[i]);
+                    }
+                    this.declaraciones1(temporal.listaIns[i]);
+                }
+            }
+        }
+    }
+
+
+    declaraciones2(temporal: NodeAst){
+        if(temporal != null){
+            if(temporal.listaIns != null && temporal.listaIns.length > 0){
+                for(let i=0;i<temporal.listaIns.length;i++){
+                    if(temporal.listaIns[i].tipo1 == "Declaracion"){
+                       this.dec2.push(temporal.listaIns[i]);
+                    }
+                    this.declaraciones2(temporal.listaIns[i]);
+                }
+            }
+        }
+    }
+
+    variables1(temporal: NodeAst){
+        if(temporal != null){
+            if(temporal.listaIns != null && temporal.listaIns.length > 0){
+                for(let i=0;i<temporal.listaIns.length;i++){
+                    if(temporal.listaIns[i].tipo1 == "Variable"){
+                       this.vars1.push(temporal.listaIns[i]);
+                    }
+                    this.variables1(temporal.listaIns[i]);
+                }
+            }
+        }
+    }
+
+
+    variables2(temporal: NodeAst){
+        if(temporal != null){
+            if(temporal.listaIns != null && temporal.listaIns.length > 0){
+                for(let i=0;i<temporal.listaIns.length;i++){
+                    if(temporal.listaIns[i].tipo1 == "Variable"){
+                        this.vars2.push(temporal.listaIns[i]);
+                    }
+                    this.variables2(temporal.listaIns[i]);
+                }
+            }
+        }
+    }
+
 
 }

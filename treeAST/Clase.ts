@@ -10,6 +10,4 @@ export class Clase{
         this.funciones = funciones;
     }
 
-
-
 }
